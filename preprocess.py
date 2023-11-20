@@ -7,7 +7,7 @@ frame_height = 480
 
 # 원근 변환 후 결과 이미지의 크기
 output_height = 480
-output_width = int(output_height*1.414)
+output_width = 680
 
 def scan_image(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) # 흑백으로 변환
@@ -39,11 +39,12 @@ def scan_image(image):
                 
                 # 원근 변환 시작 ------
                 # 원근 변환 전 4개의 점들
+                c = 25 # 보정값(테두리 없애기)
                 src_points = np.array([
-                    [templi[3][0], templi[3][1]],  # Top-Left
-                    [templi[0][0], templi[0][1]],  # Top-Right
-                    [templi[1][0], templi[1][1]],  # Bottom-Right
-                    [templi[2][0], templi[2][1]]   # Bottom-Left
+                    [templi[3][0]-c, templi[3][1]+c],  # Top-Left
+                    [templi[0][0]+c, templi[0][1]+c],  # Top-Right
+                    [templi[1][0]+c, templi[1][1]-c],  # Bottom-Right
+                    [templi[2][0]-c, templi[2][1]-c]   # Bottom-Left
                 ], dtype=np.float32)
 
                 # 원근 변환 될 프레임의 4개의 점들
