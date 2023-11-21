@@ -62,7 +62,7 @@ def scan_image(image):
                 # 바이너리 이미지로 만들어서 저장하는 파트
                 captured_gray_image = cv2.cvtColor(captured_image, cv2.COLOR_BGR2GRAY)
                 global captured_binary_image
-                captured_binary_image = cv2.adaptiveThreshold(captured_gray_image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 10)
+                captured_binary_image = cv2.adaptiveThreshold(captured_gray_image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 17, 10) # 11,10
                 return 9
 
 def getProcessedImage():
