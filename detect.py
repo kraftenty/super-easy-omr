@@ -1,35 +1,14 @@
 import cv2
+from properties import status, values
 
 
-WIDTH = 680
-HEIGHT = 480
-MATRIX_WIDTH = 19
+MATRIX_OUTPUT_WIDTH = 19
 MATRIX_HEIGHT = 12
 SAFECODE_LINE = 18
 
 UNMARK = 0
 MARK = 1
 
-SUCCESSFUL = {
-    'code' : 0,
-    'msg' : '[INFO] Successful.'
-}
-ERR_NUM_OF_GUIDE_INCORRECT = {
-    'code' : 5,
-    'msg' : '[ERROR] The number of guides is incorrect.'
-}
-ERR_ID_MARKING_DUPLICATED = {
-    'code' : 6,
-    'msg' : '[ERROR] ID marking is duplicated. ID is not readable.'
-}
-ERR_NUM_OF_SAFENUM_INCORRECT = {
-    'code' : 7,
-    'msg' : '[ERROR] The number of safenum is incorrect.'
-}
-ERR_NO_MATCHING_SAFECODE = {
-    'code' : 8,
-    'msg' : '[ERROR] No matching safecode.'
-}
 
 def findGuides(contours, color_img):
     upper_guides = []
@@ -45,7 +24,7 @@ def findGuides(contours, color_img):
             cv2.circle(color_img, (cx, cy), 5, (255, 0, 0), -1)
             upper_guides.append((cx, cy))
         # 중심점이 오른쪽에서 15px 이내이면 right_guides에 추가
-        if cx >= WIDTH - 15:
+        if cx >= values.OUTPUT_WIDTH - 15:
             cv2.circle(color_img, (cx, cy), 5, (255, 0, 0), -1)
             right_guides.append((cx, cy))
 
@@ -55,10 +34,10 @@ def findGuides(contours, color_img):
 
 
 def doDot(upper_guides, right_guides, binary_img, color_img):
-    if MATRIX_WIDTH != len(upper_guides) and MATRIX_HEIGHT != len(right_guides):
-        print(ERR_NUM_OF_GUIDE_INCORRECT['msg'])
-        return None, ERR_NUM_OF_GUIDE_INCORRECT['code']
-    ptr_matrix = [[UNMARK for _ in range(MATRIX_WIDTH)] for _ in range(MATRIX_HEIGHT)]
+    if MATRIX_OUTPUT_WIDTH != len(upper_guides) and MATRIX_HEIGHT != len(right_guides):
+        print(status.ERR_NUM_OF_GUIDE_INCORRECT['msg'])
+        return None, status.ERR_NUM_OF_GUIDE_INCORRECT['code']
+    ptr_matrix = [[UNMARK for _ in range(MATRIX_OUTPUT_WIDTH)] for _ in range(MATRIX_HEIGHT)]
     # 점 검사 핵심 루프
     for right_idx, right_ptr in enumerate(right_guides):
         for upper_idx, upper_ptr in enumerate(upper_guides):
@@ -70,7 +49,7 @@ def doDot(upper_guides, right_guides, binary_img, color_img):
             else:
                 cv2.circle(color_img, (upper_ptr[0], right_ptr[1]), 3, (0, 255, 0), -1)
                 ptr_matrix[right_idx][upper_idx] = MARK
-    return ptr_matrix, SUCCESSFUL['code']
+    return ptr_matrix, status.SUCCESSFUL['code']
 
 
 # id(학번) 검출하는 함수
@@ -84,9 +63,9 @@ def getId(ptr_matrix):
                     id += str(y)
                     was_read_in_col = True
                 else:
-                    print(ERR_ID_MARKING_DUPLICATED['msg'])
-                    return None, ERR_ID_MARKING_DUPLICATED['code']
-    return id, SUCCESSFUL['code']
+                    print(status.ERR_ID_MARKING_DUPLICATED['msg'])
+                    return None, status.ERR_ID_MARKING_DUPLICATED['code']
+    return id, status.SUCCESSFUL['code']
 
 
 # safenum 위치 알아내서 반환하는 함수
@@ -100,10 +79,10 @@ def getSafeNums(ptr_matrix):
             else:
                 second_answerline_safenums.append(code_idx)
     if len(first_answerline_safenums) != 2 or len(second_answerline_safenums) != 2:
-        print(ERR_NUM_OF_SAFENUM_INCORRECT['msg'])
-        return None, None, ERR_NUM_OF_SAFENUM_INCORRECT['code']
+        print(status.ERR_NUM_OF_SAFENUM_INCORRECT['msg'])
+        return None, None, status.ERR_NUM_OF_SAFENUM_INCORRECT['code']
     
-    return first_answerline_safenums, second_answerline_safenums, SUCCESSFUL['code']
+    return first_answerline_safenums, second_answerline_safenums, status.SUCCESSFUL['code']
 
 
 # safecode 생성하는 함수
@@ -116,16 +95,16 @@ def getSafeCode(first_answerline_safenums, second_answerline_safenums):
     # 4,11 / 4,11  : 4 #
     ####################
     if first_answerline_safenums == [0,7] and second_answerline_safenums == [0,7]:
-        return 1, SUCCESSFUL['code']
+        return 1, status.SUCCESSFUL['code']
     elif first_answerline_safenums == [0,7] and second_answerline_safenums == [4,11]:
-        return 2, SUCCESSFUL['code']
+        return 2, status.SUCCESSFUL['code']
     elif first_answerline_safenums == [4,11] and second_answerline_safenums == [0,7]:
-        return 3, SUCCESSFUL['code']
+        return 3, status.SUCCESSFUL['code']
     elif first_answerline_safenums == [4,11] and second_answerline_safenums == [4,11]:
-        return 4, SUCCESSFUL['code']
+        return 4, status.SUCCESSFUL['code']
     else:
-        print(ERR_NO_MATCHING_SAFECODE['msg'])
-        return -1, ERR_NO_MATCHING_SAFECODE['code']
+        print(status.ERR_NO_MATCHING_SAFECODE['msg'])
+        return -1, status.ERR_NO_MATCHING_SAFECODE['code']
 
 
 # 첫번째 정답라인 정답 검출하는 함수
@@ -182,20 +161,20 @@ def getDetectedValues(preprocessed_img):
     upper_guides, right_guides = findGuides(contours, color_img)
     # 점 찍기
     ptr_matrix, doDot_status_code = doDot(upper_guides, right_guides, binary_img, color_img)
-    if doDot_status_code == ERR_NUM_OF_GUIDE_INCORRECT['code']:
-        return None, None, ERR_NUM_OF_GUIDE_INCORRECT['code']
+    if doDot_status_code != status.SUCCESSFUL['code']:
+        return None, None, status.ERR_NUM_OF_GUIDE_INCORRECT['code']
     # id 검출
     id, getId_status_code = getId(ptr_matrix)
-    if getId_status_code == ERR_ID_MARKING_DUPLICATED['code']:
-        return None, None, ERR_ID_MARKING_DUPLICATED['code']
+    if getId_status_code != status.SUCCESSFUL['code']:
+        return None, None, status.ERR_ID_MARKING_DUPLICATED['code']
     # safenum 검출    
     first_answerline_safenums, second_answerline_safenums, getSafeNums_status_code = getSafeNums(ptr_matrix)
-    if getSafeNums_status_code == ERR_NUM_OF_SAFENUM_INCORRECT['code']:
-        return None, None, ERR_NUM_OF_SAFENUM_INCORRECT['code']
+    if getSafeNums_status_code != status.SUCCESSFUL['code']:
+        return None, None, status.ERR_NUM_OF_SAFENUM_INCORRECT['code']
     # safecode 검출
     safecode, getSafeCode_status_code = getSafeCode(first_answerline_safenums, second_answerline_safenums)
-    if getSafeCode_status_code == ERR_NO_MATCHING_SAFECODE['code']:
-        return None, None, ERR_NO_MATCHING_SAFECODE['code']
+    if getSafeCode_status_code != status.SUCCESSFUL['code']:
+        return None, None, status.ERR_NO_MATCHING_SAFECODE['code']
     
 
     # 점 찍힌 이미지
@@ -216,4 +195,4 @@ def getDetectedValues(preprocessed_img):
     # safecode가 둘다 맞는지 체크
     is_safecode_valid = is_first_answerline_safecode_valid and is_second_answerline_safecode_valid
 
-    return (id, is_safecode_valid, first_answerline_answers, second_answerline_answers), color_img, SUCCESSFUL['code']
+    return (id, is_safecode_valid, first_answerline_answers, second_answerline_answers), color_img, status.SUCCESSFUL['code']

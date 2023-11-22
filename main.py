@@ -4,20 +4,16 @@ import cv2
 
 import detect
 import scanner
+from properties import status, values
+from answer import answer
 
-# 웹캠 화면 크기 및 출력 이미지 크기 설정
-FRAME_WIDTH = 800
-FRAME_HEIGHT = 480
-OUTPUT_WIDTH = 680
-OUTPUT_HEIGHT = 480
-CANVAS_WIDTH = OUTPUT_WIDTH * 2
-CANVAS_HEIGHT = int(OUTPUT_HEIGHT * 1.5)
+
 # Tkinter 윈도우 설정
 window = Tk()
 window.title("Super Easy OMR Reader")
 
 # 캔버스 생성
-canvas = Canvas(window, width=CANVAS_WIDTH, height=CANVAS_HEIGHT)
+canvas = Canvas(window, width=values.CANVAS_WIDTH, height=values.CANVAS_HEIGHT)
 canvas.pack()
 
 # 검출된 값 라벨
@@ -26,82 +22,65 @@ detected_values_label.pack()
 
 # 웹캠 연결
 cap = cv2.VideoCapture(0)
-cap.set(3, FRAME_WIDTH)
-cap.set(4, FRAME_HEIGHT)
+cap.set(3, values.FRAME_WIDTH)
+cap.set(4, values.FRAME_HEIGHT)
 
 if not cap.isOpened():
     print('[ERROR] Cannot Find WebCam.')
     exit()
 
-preprocessedImg = None
-detectedValues = None  # 검출된 값 변수
-detectedImage = None   # 검출된 이미지 변수
+# preprocessed_img = None
+detected_values = None  # 검출된 값 변수
+detected_img = None   # 검출된 이미지 변수
 webcam_image = None
 gray_canvas_image = None
 
 # 웹캠 프레임 업데이트 함수
 def update_frame():
-    global preprocessedImg, detectedValues, detectedImage
+    global detected_values, detected_img
     global webcam_image, gray_canvas_image
     ret, frame = cap.read()
     if ret:
         flipped_frame = cv2.flip(frame, 1)
-        frame_copy = flipped_frame.copy()
-        captured_binary_image = scanner.scan_image(frame_copy, FRAME_WIDTH, FRAME_HEIGHT, OUTPUT_WIDTH, OUTPUT_HEIGHT)
-        
-        if captured_binary_image is not None:
+        scanned_binary_img = scanner.scan_image(flipped_frame, values.FRAME_WIDTH, values.FRAME_HEIGHT, values.OUTPUT_WIDTH, values.OUTPUT_HEIGHT)
+        if scanned_binary_img is not None:
             print('[INFO] Captured!')
-            preprocessedImg = captured_binary_image
-            detectedValues, detectedImage, detectStatusCode = detect.getDetectedValues(preprocessedImg)
-            if detectStatusCode != 0:
-                pass
-            else:
-                update_detected_values_label()  # 라벨 업데이트 함수 호출
+            detected_values, detected_img, getDetectedValues_status_code = detect.getDetectedValues(scanned_binary_img)
+            if getDetectedValues_status_code == status.SUCCESSFUL['code']:
+                detected_values_label.config(text=str(detected_values))
+                # 채점 부분
+                
 
-        # 웹캠 화면 이미지 생성
-        flipped_frame = cv2.cvtColor(flipped_frame, cv2.COLOR_BGR2RGB)
-        flipped_frame = Image.fromarray(flipped_frame)
-        flipped_frame = ImageTk.PhotoImage(flipped_frame.resize((FRAME_WIDTH, FRAME_HEIGHT)))
+        # 웹캠 이미지 부분
+        color_modified_frame = cv2.cvtColor(flipped_frame, cv2.COLOR_BGR2RGB)
+        photofied_frame = ImageTk.PhotoImage(Image.fromarray(color_modified_frame).resize((values.FRAME_WIDTH, values.FRAME_HEIGHT)))
+        # 웹캠 이미지 업데이트    
+        if webcam_image is None: # 웹캠 이미지가 없으면 할당
+            webcam_image = canvas.create_image(values.OUTPUT_WIDTH//2, values.OUTPUT_HEIGHT//2, image=photofied_frame)
+        else: # 있으면 이미지 넣어서 업데이트
+            canvas.itemconfig(webcam_image, image=photofied_frame)
 
-        
-
-        # 웹캠 화면 이미지 업데이트
-        if webcam_image is None:
-            ### 웹캠 이미지
-            webcam_image = canvas.create_image(OUTPUT_WIDTH//2, OUTPUT_HEIGHT//2, image=flipped_frame)
-        else:
-            canvas.itemconfig(webcam_image, image=flipped_frame)
-
-        # 감지 화면 이미지 생성
-        if detectedImage is not None:
-            # detectedImage를 사용하기 위한 처리
-            detected_image = cv2.cvtColor(detectedImage, cv2.COLOR_BGR2RGB)
-            detected_image = Image.fromarray(detected_image)
-            detected_image = ImageTk.PhotoImage(detected_image.resize((OUTPUT_WIDTH, OUTPUT_HEIGHT)))  # 크기 조정
-        else:
-            # 회색 화면 이미지 생성
-            detected_image = Image.new('RGB', (OUTPUT_WIDTH, OUTPUT_HEIGHT), color='gray')
-            detected_image = ImageTk.PhotoImage(detected_image)
-
+        # 감지 화면 이미지 부분
+        if detected_img is None: # 감지된 것이 없으면 회색 이미지 생성
+            photofied_detected_img = ImageTk.PhotoImage(Image.new('RGB', (values.OUTPUT_WIDTH, values.OUTPUT_HEIGHT), color='gray'))
+        else:                    # 감지된 것이 있으면 점마킹처리된 이미지 사용
+            color_modified_detected_img = cv2.cvtColor(detected_img, cv2.COLOR_BGR2RGB)
+            photofied_detected_img = ImageTk.PhotoImage(Image.fromarray(color_modified_detected_img).resize((values.OUTPUT_WIDTH, values.OUTPUT_HEIGHT)))
         # 감지 화면 이미지 업데이트
         if gray_canvas_image is None:
-            gray_canvas_image = canvas.create_image(OUTPUT_WIDTH + OUTPUT_WIDTH//2, OUTPUT_HEIGHT//2, image=detected_image)
+            gray_canvas_image = canvas.create_image(values.OUTPUT_WIDTH + values.OUTPUT_WIDTH//2, values.OUTPUT_HEIGHT//2, image=photofied_detected_img)
         else:
-            canvas.itemconfig(gray_canvas_image, image=detected_image)
+            canvas.itemconfig(gray_canvas_image, image=photofied_detected_img)
+        
+        # 캔버스에 웹캠화면과 감지화면 그려넣기
+        canvas.left_img = photofied_frame
+        canvas.right_img = photofied_detected_img
 
-        canvas.image = flipped_frame
-        canvas.gray_image = detected_image
+    window.after(100, update_frame) # 100ms마다 업데이트
 
-    window.after(10, update_frame)
 
-# 검출된 값을 표시하는 라벨 업데이트 함수
-def update_detected_values_label():
-    if detectedValues is not None:
-        detected_values_label.config(text=str(detectedValues))
 
 
 update_frame()
-
 window.mainloop()
-
 cap.release()
