@@ -97,3 +97,7 @@ def getProcessedImage():
     if captured_binary_image is not None:
         # cv2.imwrite("captured_image.png", captured_binary_image)
         return captured_binary_image
+
+
+preprocessedImg = getProcessedImage()
+print('done')

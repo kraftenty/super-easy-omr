@@ -1,33 +1,8 @@
 import cv2
 import numpy as np
-from tkinter import *
-from PIL import Image, ImageTk
 
-# 웹캠 화면 크기 설정
-frame_width = 800
-frame_height = 480
 
-# 원근 변환 후 결과 이미지의 크기
-output_height = 480
-output_width = 680
-
-# Tkinter 윈도우 설정
-window = Tk()
-window.title("TKinter 화면")
-canvas = Label(window)
-canvas.pack()
-
-# 웹캠 연결
-cap = cv2.VideoCapture(0)
-cap.set(3, frame_width)
-cap.set(4, frame_height)
-
-# 웹캠이 정상적으로 연결되었는지 확인
-if not cap.isOpened():
-    print('Cannot Find WebCam')
-    exit()
-
-def scan_image(image):
+def scan_image(image, frame_width, frame_height, output_width, output_height):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) # 흑백으로 변환
     edges = cv2.Canny(gray, 30, 80) # 엣지 검출
     contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE) # 엣지 검출 결과에서 사각형 찾기
@@ -79,34 +54,7 @@ def scan_image(image):
 
                 # 바이너리 이미지로 만들어서 저장하는 파트
                 captured_gray_image = cv2.cvtColor(captured_image, cv2.COLOR_BGR2GRAY)
-                global captured_binary_image
                 captured_binary_image = cv2.adaptiveThreshold(captured_gray_image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 17, 10) # 11,10
-                return 9
-
-def update_frame():
-    ret, frame = cap.read()
-    if ret:
-        frame = cv2.flip(frame, 1)  # 좌우 반전(거울 모드)
-        status = scan_image(frame)
-        if status== 9:
-            print('captured!!!')
-            
-            return
-
-        # OpenCV 이미지를 Tkinter에서 사용할 수 있는 형식으로 변환
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # BGR -> RGB
-        frame = Image.fromarray(frame)  # OpenCV -> PIL
-        frame = ImageTk.PhotoImage(frame)  # PIL -> ImageTk
-
-        canvas.config(image=frame)
-        canvas.image = frame
-        window.after(10, update_frame)
-
-# 프레임 업데이트 시작
-update_frame()
-
-# 메인 루프 실행
-window.mainloop()
-
-# 종료 시 웹캠 해제
-cap.release()
+                return captured_binary_image
+    return None
+    
