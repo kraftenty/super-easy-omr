@@ -52,9 +52,8 @@ def update_frame():
         if captured_binary_image is not None:
             print('[INFO] Captured!')
             preprocessedImg = captured_binary_image
-            detectedValues, detectedImage = detect.getDetectedValues(preprocessedImg)
-            if detectedValues is None or detectedImage is None:
-                ####################
+            detectedValues, detectedImage, detectStatusCode = detect.getDetectedValues(preprocessedImg)
+            if detectStatusCode != 0:
                 pass
             else:
                 update_detected_values_label()  # 라벨 업데이트 함수 호출
@@ -64,7 +63,16 @@ def update_frame():
         flipped_frame = Image.fromarray(flipped_frame)
         flipped_frame = ImageTk.PhotoImage(flipped_frame.resize((FRAME_WIDTH, FRAME_HEIGHT)))
 
-        # 회색 화면 이미지 생성 (예시)
+        
+
+        # 웹캠 화면 이미지 업데이트
+        if webcam_image is None:
+            ### 웹캠 이미지
+            webcam_image = canvas.create_image(OUTPUT_WIDTH//2, OUTPUT_HEIGHT//2, image=flipped_frame)
+        else:
+            canvas.itemconfig(webcam_image, image=flipped_frame)
+
+        # 감지 화면 이미지 생성
         if detectedImage is not None:
             # detectedImage를 사용하기 위한 처리
             detected_image = cv2.cvtColor(detectedImage, cv2.COLOR_BGR2RGB)
@@ -75,14 +83,7 @@ def update_frame():
             detected_image = Image.new('RGB', (OUTPUT_WIDTH, OUTPUT_HEIGHT), color='gray')
             detected_image = ImageTk.PhotoImage(detected_image)
 
-        # 웹캠 화면 이미지 업데이트
-        if webcam_image is None:
-            ### 웹캠 이미지
-            webcam_image = canvas.create_image(OUTPUT_WIDTH//2, OUTPUT_HEIGHT//2, image=flipped_frame)
-        else:
-            canvas.itemconfig(webcam_image, image=flipped_frame)
-
-        # 회색 화면 이미지 업데이트
+        # 감지 화면 이미지 업데이트
         if gray_canvas_image is None:
             gray_canvas_image = canvas.create_image(OUTPUT_WIDTH + OUTPUT_WIDTH//2, OUTPUT_HEIGHT//2, image=detected_image)
         else:
