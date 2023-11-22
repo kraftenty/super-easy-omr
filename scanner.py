@@ -17,8 +17,8 @@ def scan_image(image, frame_width, frame_height, output_width, output_height):
             # 사각형의 면적 계산
             area = cv2.contourArea(approx)
 
-            # 사각형의 면적이 전체 화면 면적의 1/1.25 이상인 경우에만 연두색으로 채웁니다.
-            if area >= (frame_width * frame_height) / 1.25:
+            # 사각형의 면적이 전체 화면 면적의 1/1.125 이상인 경우에만 연두색으로 채웁니다.
+            if area >= (frame_width * frame_height) / 1.125:
                 # cv2.drawContours(image, [approx], 0, (0, 255, 0), -1)  # 연두색으로 채움
                 
                 templi = []

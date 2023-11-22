@@ -35,7 +35,8 @@ def doDot(upper_guides, right_guides, binary_img, color_img):
     if MATRIX_WIDTH != len(upper_guides) and MATRIX_HEIGHT != len(right_guides):
         print('[ERROR] The number of recognized guide points is incorrect.')
         print('        ERROR CODE 5')
-        exit(5)
+        return None, 5
+        # exit(5)
     ptr_matrix = [[0 for _ in range(MATRIX_WIDTH)] for _ in range(MATRIX_HEIGHT)]
     # 점 검사 핵심 루프
     for rightIdx, rightPtr in enumerate(right_guides):
@@ -53,7 +54,7 @@ def doDot(upper_guides, right_guides, binary_img, color_img):
     #     for x in range(MATRIX_WIDTH):
     #         print(ptr_matrix[y][x], end='')
     #     print()
-    return ptr_matrix
+    return ptr_matrix, 0
 
 
 def getId(ptr_matrix):
@@ -165,7 +166,9 @@ def getDetectedValues(preprocessedImg):
     # 가이드 찾기
     upper_guides, right_guides = findGuides(contours, color_img)
     # 점 찍기
-    ptr_matrix = doDot(upper_guides, right_guides, binary_img, color_img)
+    ptr_matrix, doDot_status_code = doDot(upper_guides, right_guides, binary_img, color_img)
+    if doDot_status_code != 0:
+        return None, None
     # id 검출
     id = getId(ptr_matrix)
     # safenum 검출    
@@ -180,16 +183,16 @@ def getDetectedValues(preprocessedImg):
 
 
     # 점 찍힌 이미지
-    cv2.imshow("Result", color_img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.imshow("Result", color_img)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
 
-    # 이진처리된 이미지
-    cv2.imshow("Result", preprocessedImg)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # # 이진처리된 이미지
+    # cv2.imshow("Result", preprocessedImg)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
     
 
     is_safecode_valid = is_first_answerline_safecode_valid and is_second_answerline_safecode_valid
-    return id, is_safecode_valid, first_answerline_answers, second_answerline_answers
+    return (id, is_safecode_valid, first_answerline_answers, second_answerline_answers), color_img
