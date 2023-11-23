@@ -21,6 +21,8 @@ class status:
     }
 
 class values:
+    ANSWER_FILE_PATH = 'answer.json' # 정답 파일 경로
+
     FRAME_WIDTH = 800 # 웹캠 프레임 너비
 
     FRAME_HEIGHT = 480 # 웹캠 프레임 높이
@@ -32,3 +34,7 @@ class values:
     CANVAS_WIDTH = OUTPUT_WIDTH * 2 # 캔버스 너비
 
     CANVAS_HEIGHT = int(OUTPUT_HEIGHT * 1.5) # 캔버스 높이
+
+    LOG_INFO = '#00FF00' # 인포 로그 색상
+
+    LOG_ERR = '#FF0000' # 에러 로그 색상

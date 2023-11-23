@@ -2,9 +2,9 @@ import cv2
 from properties import status, values
 
 
-MATRIX_OUTPUT_WIDTH = 19
-MATRIX_HEIGHT = 12
-SAFECODE_LINE = 18
+OUTPUT_MATRIX_WIDTH = 19
+OUTPUT_MATRIX_HEIGHT = 12
+SAFECODE_LINE_COL_IDX = 18
 
 UNMARK = 0
 MARK = 1
@@ -20,12 +20,12 @@ def findGuides(contours, color_img):
         cx = x + w // 2
         cy = y + h // 2
         # 중심점이 위에서 15px 이내이면 upperGuidesList에 추가
-        if cy <= 15: 
-            cv2.circle(color_img, (cx, cy), 5, (255, 0, 0), -1)
+        if cy <= 15:                           # B   G   R
+            cv2.circle(color_img, (cx, cy), 5, (0, 255, 255), -1)
             upper_guides.append((cx, cy))
         # 중심점이 오른쪽에서 15px 이내이면 right_guides에 추가
         if cx >= values.OUTPUT_WIDTH - 15:
-            cv2.circle(color_img, (cx, cy), 5, (255, 0, 0), -1)
+            cv2.circle(color_img, (cx, cy), 5, (0, 255, 255), -1)
             right_guides.append((cx, cy))
 
     upper_guides.sort(key=lambda x: x[0]) # 왼쪽에 있는(x값이 작은) 점부터 정렬
@@ -34,10 +34,10 @@ def findGuides(contours, color_img):
 
 
 def doDot(upper_guides, right_guides, binary_img, color_img):
-    if MATRIX_OUTPUT_WIDTH != len(upper_guides) and MATRIX_HEIGHT != len(right_guides):
+    if OUTPUT_MATRIX_WIDTH != len(upper_guides) and OUTPUT_MATRIX_HEIGHT != len(right_guides):
         print(status.ERR_NUM_OF_GUIDE_INCORRECT['msg'])
         return None, status.ERR_NUM_OF_GUIDE_INCORRECT['code']
-    ptr_matrix = [[UNMARK for _ in range(MATRIX_OUTPUT_WIDTH)] for _ in range(MATRIX_HEIGHT)]
+    ptr_matrix = [[UNMARK for _ in range(OUTPUT_MATRIX_WIDTH)] for _ in range(OUTPUT_MATRIX_HEIGHT)]
     # 점 검사 핵심 루프
     for right_idx, right_ptr in enumerate(right_guides):
         for upper_idx, upper_ptr in enumerate(upper_guides):
@@ -73,7 +73,7 @@ def getSafeNums(ptr_matrix):
     first_answerline_safenums = []
     second_answerline_safenums = []
     for y, code_idx in enumerate((0,4,7,11,0,4,7,11)):
-        if ptr_matrix[y][SAFECODE_LINE] == MARK:
+        if ptr_matrix[y][SAFECODE_LINE_COL_IDX] == MARK:
             if y < 4:
                 first_answerline_safenums.append(code_idx)
             else:
@@ -195,4 +195,5 @@ def getDetectedValues(preprocessed_img):
     # safecode가 둘다 맞는지 체크
     is_safecode_valid = is_first_answerline_safecode_valid and is_second_answerline_safecode_valid
 
-    return (id, is_safecode_valid, first_answerline_answers, second_answerline_answers), color_img, status.SUCCESSFUL['code']
+
+    return (id, is_safecode_valid, first_answerline_answers, second_answerline_answers, safecode), color_img, status.SUCCESSFUL['code']
