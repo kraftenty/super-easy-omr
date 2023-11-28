@@ -1,3 +1,4 @@
+# 점수 채점해서 총점, OX_map, score_map 반환하는 함수
 def evaluateAnswer(detected_answer_li, answer_map):
     total_sum_score = 0
     OX_map = dict()

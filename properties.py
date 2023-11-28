@@ -1,3 +1,4 @@
+# 로깅할때 쓰는 상태값을 저장하는 클래스
 class status:
     SUCCESSFUL = {
         'code' : 0,
@@ -20,6 +21,7 @@ class status:
         'msg' : '[ERROR] No matching safecode.'
     }
 
+# 프로그램 전체적인 상수값을 저장하는 클래스
 class values:
     ANSWER_FILE_PATH = 'answer.json' # 정답 파일 경로
 

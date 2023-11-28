@@ -7,7 +7,7 @@ def readJsonFile(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
         return json.load(file)
 
-
+# 정답 피일 읽어서 딕셔너리로 반환
 def getAnswerMap():
     try:
         data = readJsonFile(values.ANSWER_FILE_PATH)

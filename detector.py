@@ -37,28 +37,28 @@ def doDot(upper_guides, right_guides, binary_img, color_img):
     if OUTPUT_MATRIX_WIDTH != len(upper_guides) and OUTPUT_MATRIX_HEIGHT != len(right_guides):
         print(status.ERR_NUM_OF_GUIDE_INCORRECT['msg'])
         return None, status.ERR_NUM_OF_GUIDE_INCORRECT['code']
-    ptr_matrix = [[UNMARK for _ in range(OUTPUT_MATRIX_WIDTH)] for _ in range(OUTPUT_MATRIX_HEIGHT)]
+    marking_tf_matrix = [[UNMARK for _ in range(OUTPUT_MATRIX_WIDTH)] for _ in range(OUTPUT_MATRIX_HEIGHT)]
     # 점 검사 핵심 루프
     for right_idx, right_ptr in enumerate(right_guides):
         for upper_idx, upper_ptr in enumerate(upper_guides):
             # 바이너리 이미지의 해당 좌표에 마킹이 없으면
             if binary_img[right_ptr[1], upper_ptr[0]] == 0:
                 cv2.circle(color_img, (upper_ptr[0], right_ptr[1]), 3, (0, 0, 255), -1)
-                ptr_matrix[right_idx][upper_idx] = UNMARK
+                marking_tf_matrix[right_idx][upper_idx] = UNMARK
             # 바이너리 이미지의 해당 좌표에 마킹이 있으면
             else:
                 cv2.circle(color_img, (upper_ptr[0], right_ptr[1]), 3, (0, 255, 0), -1)
-                ptr_matrix[right_idx][upper_idx] = MARK
-    return ptr_matrix, status.SUCCESSFUL['code']
+                marking_tf_matrix[right_idx][upper_idx] = MARK
+    return marking_tf_matrix, status.SUCCESSFUL['code']
 
 
 # id(학번) 검출하는 함수
-def getId(ptr_matrix):
+def getId(marking_tf_matrix):
     id = ''
     for x in range(8):
         for y in range(10):
             was_read_in_col = False
-            if ptr_matrix[y][x] == MARK:
+            if marking_tf_matrix[y][x] == MARK:
                 if not was_read_in_col:
                     id += str(y)
                     was_read_in_col = True
@@ -69,11 +69,11 @@ def getId(ptr_matrix):
 
 
 # safenum 위치 알아내서 반환하는 함수
-def getSafeNums(ptr_matrix):
+def getSafeNums(marking_tf_matrix):
     first_answerline_safenums = []
     second_answerline_safenums = []
     for y, code_idx in enumerate((0,4,7,11,0,4,7,11)):
-        if ptr_matrix[y][SAFECODE_LINE_COL_IDX] == MARK:
+        if marking_tf_matrix[y][SAFECODE_LINE_COL_IDX] == MARK:
             if y < 4:
                 first_answerline_safenums.append(code_idx)
             else:
@@ -108,18 +108,18 @@ def getSafeCode(first_answerline_safenums, second_answerline_safenums):
 
 
 # 첫번째 정답라인 정답 검출하는 함수
-def getFirstAnswerlineAnswers(ptr_matrix, first_answerline_safenums, safecode): 
+def getFirstAnswerlineAnswers(marking_tf_matrix, first_answerline_safenums, safecode): 
     first_answerline_answers = []
     is_first_answerline_safecode_valid = True
     for y in range(0, 12):
         if y in first_answerline_safenums:   # safecode 문항이면
-            if ptr_matrix[y][8 + safecode - 1] == UNMARK:
+            if marking_tf_matrix[y][8 + safecode - 1] == UNMARK:
                 print('[ERROR] First answerline safecode is incorrect.')
                 is_first_answerline_safecode_valid = False
         else:                                # 일반문항이면
             multiple_answer_list = list()
             for x in range(8, 13): # 8~12번째 컬럼
-                if ptr_matrix[y][x] == MARK:
+                if marking_tf_matrix[y][x] == MARK:
                     multiple_answer_list.append(x-7)
             if len(multiple_answer_list) == 1:                # 단수정답이면
                 first_answerline_answers.append(multiple_answer_list[0])
@@ -129,18 +129,18 @@ def getFirstAnswerlineAnswers(ptr_matrix, first_answerline_safenums, safecode):
     return first_answerline_answers, is_first_answerline_safecode_valid
 
 # 두번째 정답라인 정답 검출하는 함수
-def getSecondAnswerlineAnswers(ptr_matrix, second_answerline_safenums, safecode):
+def getSecondAnswerlineAnswers(marking_tf_matrix, second_answerline_safenums, safecode):
     second_answerline_answers = []
     is_second_answerline_safecode_valid = True
     for y in range(0, 12):
         if y in second_answerline_safenums:     # safecode 문항이면
-            if ptr_matrix[y][13 + safecode - 1] == UNMARK:
+            if marking_tf_matrix[y][13 + safecode - 1] == UNMARK:
                 print('[ERROR] Second answerline safecode is incorrect.')
                 is_second_answerline_safecode_valid = False
         else:                                   # 일반문항이면
             multiple_answer_list = list()
             for x in range(13, 18): # 13~17번째 컬럼
-                if ptr_matrix[y][x] == MARK:
+                if marking_tf_matrix[y][x] == MARK:
                     multiple_answer_list.append(x-12)
             if len(multiple_answer_list) == 1:                # 단수정답이면
                 second_answerline_answers.append(multiple_answer_list[0])
@@ -160,15 +160,15 @@ def getDetectedValues(preprocessed_img):
     # 가이드 찾기
     upper_guides, right_guides = findGuides(contours, color_img)
     # 점 찍기
-    ptr_matrix, doDot_status_code = doDot(upper_guides, right_guides, binary_img, color_img)
+    marking_tf_matrix, doDot_status_code = doDot(upper_guides, right_guides, binary_img, color_img)
     if doDot_status_code != status.SUCCESSFUL['code']:
         return None, None, status.ERR_NUM_OF_GUIDE_INCORRECT['code']
     # id 검출
-    id, getId_status_code = getId(ptr_matrix)
+    id, getId_status_code = getId(marking_tf_matrix)
     if getId_status_code != status.SUCCESSFUL['code']:
         return None, None, status.ERR_ID_MARKING_DUPLICATED['code']
     # safenum 검출    
-    first_answerline_safenums, second_answerline_safenums, getSafeNums_status_code = getSafeNums(ptr_matrix)
+    first_answerline_safenums, second_answerline_safenums, getSafeNums_status_code = getSafeNums(marking_tf_matrix)
     if getSafeNums_status_code != status.SUCCESSFUL['code']:
         return None, None, status.ERR_NUM_OF_SAFENUM_INCORRECT['code']
     # safecode 검출
@@ -189,9 +189,9 @@ def getDetectedValues(preprocessed_img):
 
 
     # 첫번째 answerline 검출
-    first_answerline_answers, is_first_answerline_safecode_valid = getFirstAnswerlineAnswers(ptr_matrix, first_answerline_safenums, safecode)
+    first_answerline_answers, is_first_answerline_safecode_valid = getFirstAnswerlineAnswers(marking_tf_matrix, first_answerline_safenums, safecode)
     # 두번재 answerline 검출
-    second_answerline_answers, is_second_answerline_safecode_valid = getSecondAnswerlineAnswers(ptr_matrix, second_answerline_safenums, safecode)
+    second_answerline_answers, is_second_answerline_safecode_valid = getSecondAnswerlineAnswers(marking_tf_matrix, second_answerline_safenums, safecode)
     # safecode가 둘다 맞는지 체크
     is_safecode_valid = is_first_answerline_safecode_valid and is_second_answerline_safecode_valid
 
