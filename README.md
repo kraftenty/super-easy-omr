@@ -1,27 +1,28 @@
 ![title](image/title.png)
 # Super-Easy OMR Reader
 OpenCV-based real-time OMR card scoring program  
-<small>*OpenCV 기반의 실시간 OMR카드 채점 프로그램*</small>
+*OpenCV 기반의 실시간 OMR카드 채점 프로그램*
 
 No more buying expensive OMR readers and cards. Super-Easy OMR Reader, as its name suggests, is very easy and convenient. Just get your computer and webcam ready!  
-<small>*이제 더 이상 비싼 OMR 리더기와 카드를 구매하지 마십시오. Super-Easy OMR Reader는 이름 그대로 매우 쉽고 편리합니다. 컴퓨터와 웹캠만 준비하십시오!*</small>
+*이제 더 이상 비싼 OMR 리더기와 카드를 구매하지 마십시오. Super-Easy OMR Reader는 이름 그대로 매우 쉽고 편리합니다. 컴퓨터와 웹캠만 준비하십시오!*
 
 ---
 ## Contents
 - [Preparation](#preparation)
 - [How To Use](#how-to-use)
 - [Detail](#detail)
+- [References](#references)
 - [License](#license)
 ---
 ## Preparation
 - Things You Need
 > Prepare a computer with Python installed and a webcam. A laptop with a built-in webcam would be better.  
-> <small>*파이썬이 설치되어 있는 컴퓨터와 웹캠을 준비하십시오. 웹캠이 내장되어 있는 노트북이면 더 좋습니다.*</small>
+> *파이썬이 설치되어 있는 컴퓨터와 웹캠을 준비하십시오. 웹캠이 내장되어 있는 노트북이면 더 좋습니다.*
 - How To Run
 > 1. Install the Python library listed in the `requirement.txt` file.  
 > You can also install it all at once by running the command `$ pip install -r requirement.txt`.  
->  <small>*`requirement.txt` 파일에 적혀 있는 파이썬 라이브러리를 설치하십시오.*  
->  *`$ pip install -r requirement.txt` 명령어를 실행하여 한 번에 설치할 수도 있습니다.*</small>
+>  *`requirement.txt` 파일에 적혀 있는 파이썬 라이브러리를 설치하십시오.*  
+>  *`$ pip install -r requirement.txt` 명령어를 실행하여 한 번에 설치할 수도 있습니다.*
 >
 > 2. Run `app.py` with `$ python3 app.py`.  
 > *`$ python3 app.py` 로 `app.py` 를 실행하십시오.*
@@ -48,7 +49,7 @@ No more buying expensive OMR readers and cards. Super-Easy OMR Reader, as its na
 > 시험 시작 전, 인쇄한 `SafeSheet™` 들을 학생들에게 무작위로 나눠주십시오. 학생들이 옆 줄과 다른 `SafeSheet™` 를 받도록 하는 것 또한 좋은 전략입니다.*
 
 3. Input your answer
-> Enter the correct answer for your test in the `answer.json` file as shown below. You can enter up to 20 times in total.
+> Enter the correct answer for your test in the `answer.json` file as shown below. You can enter up to 20 times in total.  
 > *`answer.json` 파일에 당신의 시험의 정답을 아래와 같이 입력하십시오. 총 20번까지 입력 가능합니다.*
 > ```javascript
 > {
