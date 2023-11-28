@@ -1,7 +1,7 @@
 ![title](image/title.png)
 # Super-Easy OMR Reader
-OpenCV-based real-time OMR card scoring program  
-*OpenCV 기반의 실시간 OMR카드 채점 프로그램*
+OpenCV-based real-time anti-cheating OMR card scoring program  
+*OpenCV 기반의 실시간 부정행위 방지 OMR카드 채점 프로그램*
 
 No more buying expensive OMR readers and cards. Super-Easy OMR Reader, as its name suggests, is very easy and convenient. Just get your computer and webcam ready!  
 *이제 더 이상 비싼 OMR 리더기와 카드를 구매하지 마십시오. Super-Easy OMR Reader는 이름 그대로 매우 쉽고 편리합니다. 컴퓨터와 웹캠만 준비하십시오!*
@@ -49,7 +49,7 @@ No more buying expensive OMR readers and cards. Super-Easy OMR Reader, as its na
 > 시험 시작 전, 인쇄한 `SafeSheet™` 들을 학생들에게 무작위로 나눠주십시오. 학생들이 옆 줄과 다른 `SafeSheet™` 를 받도록 하는 것 또한 좋은 전략입니다.*
 
 3. Input your answer
-> Enter the correct answer for your test in the `answer.json` file as shown below. You can enter up to 20 times in total.  
+> Enter the correct answer for your test in the `answer.json` file as shown below. You can enter up to number 20.  
 > *`answer.json` 파일에 당신의 시험의 정답을 아래와 같이 입력하십시오. 총 20번까지 입력 가능합니다.*
 > ```javascript
 > {
@@ -67,9 +67,9 @@ No more buying expensive OMR readers and cards. Super-Easy OMR Reader, as its na
 >    },
 > }
 > 
-> // The answer to question 1 is 3, and the score is 5 points.
-> // The answer to question 2 is 1 and 4, and the score is 5 points.
-> // The answer to question 3 is 5, and the score is 8.
+> // The answer to question 1 is 3, and the points is 5.
+> // The answer to question 2 is 1 and 4, and the points is 5.
+> // The answer to question 3 is 5, and the points is 8.
 > // ...
 > // 1번 문제의 답은 3번, 배점은 5점
 > // 2번 문제의 답은 1번과 4번, 배점은 5점
@@ -93,7 +93,7 @@ No more buying expensive OMR readers and cards. Super-Easy OMR Reader, as its na
 
 5. Check the saved file
 > ![readme_4](image/readme_4.png)  
-> A txt file containing students' `Student ID`, `Answer`, and `Total Point` is automatically created. Please use these results to calculate your grades!  
+> A txt file containing students' `Student ID`, `Answer`, and `Total Point` is automatically created. Please use these results to calculate the grades!  
 > *학생들의 `Student ID`, `Answer`, `Total Point` 가 포함된 txt 파일이 자동으로 생성됩니다. 이 결과를 가지고 성적 산출에 활용하시길 바랍니다!*
 
 ---
