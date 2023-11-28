@@ -177,7 +177,7 @@ def getDetectedValues(preprocessed_img):
         return None, None, status.ERR_NO_MATCHING_SAFECODE['code']
     
 
-    # 점 찍힌 이미지
+    # # 점 찍힌 이미지
     # cv2.imshow("Result", color_img)
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()

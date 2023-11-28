@@ -104,7 +104,7 @@ def show_splash_screen(root):
     splash.overrideredirect(True)
     splash.geometry("600x400")
 
-    splash_image = PhotoImage(file="splash.png")
+    splash_image = PhotoImage(file="image/splash.png")
 
     # 스플래시 화면 크기 및 위치 설정
     splash_width = splash_image.width()
